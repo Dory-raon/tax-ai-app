@@ -1,8 +1,13 @@
 import streamlit as st
 import time
+import google.generativeai as genai
 
-# --- [1. 우리만의 내부 지식 데이터베이스 구축 (RAG 모의 테스트용)] ---
-# 실제 서비스에서는 법제처 API와 크롤링으로 수집한 수만 건의 데이터가 이곳을 대체합니다.
+# API 키 불러오기 및 제미나이 모델 설정
+api_key = st.secrets["GEMINI_API_KEY"]
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel('gemini-2.5-flash')
+
+# 1. 우리만의 내부 지식 데이터베이스 (RAG 모의 테스트용)
 KNOWLEDGE_DB = [
     {
         "쟁점": "유언대용신탁", 
@@ -21,42 +26,34 @@ KNOWLEDGE_DB = [
     }
 ]
 
-# --- [2. 검색 엔진 로직 (AI가 조건에 맞는 데이터를 찾는 과정)] ---
+# 2. 검색 엔진 로직
 def search_strategy(asset_value, conflict_risk):
     results = []
-    
-    # 세무 리스크 분석 (최고세율 50% 구간 확인)
     if asset_value >= 30:
-        results.append("⚠️ [세무 리스크 경고] 예상 상속재산이 30억을 초과하여 최고 누진세율 50% 구간에 진입했습니다. 강력한 사전증여 플랜이 필요합니다.")
+        results.append("[세무 리스크] 30억 초과로 최고 누진세율 50% 구간 진입. 강력한 사전증여 플랜 필요.")
         
-    # 법률 리스크 분석 (분쟁 위험도에 따른 DB 검색)
     if conflict_risk == "높음 (유류분 청구 예상)":
-        results.append("🔍 [분쟁 방어 전략 검색 완료]")
         for item in KNOWLEDGE_DB:
             if item["분류"] in ["분쟁방어", "분쟁방어 및 재원마련"]:
-                results.append(f"- {item['쟁점']}: {item['내용']}")
+                results.append(f"[{item['쟁점']}] {item['내용']}")
     else:
-        results.append("🔍 [일반 절세 전략 검색 완료]")
         for item in KNOWLEDGE_DB:
             if item["분류"] == "절세극대화":
-                results.append(f"- {item['쟁점']}: {item['내용']}")
-                
-    return results
+                results.append(f"[{item['쟁점']}] {item['내용']}")
+    return "\n".join(results)
 
-# --- [3. 웹사이트 화면 UI 설정] ---
+# 3. 웹사이트 화면 UI 설정
 st.set_page_config(page_title="AI 상속/증여 세무 컨설턴트", page_icon="⚖️")
 st.title("AI 상속/증여 세무 컨설턴트 💼")
-st.markdown("고객 상황을 좌측에 입력하고 엔터를 치시면, 내부 DB를 검색하여 맞춤형 전략을 도출합니다.")
+st.markdown("고객 상황을 분석하여 AI가 자연스러운 문장으로 절세 전략을 제안합니다.")
 
-# 사이드바 입력창
 with st.sidebar:
     st.header("고객 상황 조건부 입력창")
     asset_value = st.number_input("예상 상속/증여 재산 (억원)", min_value=0, value=50)
     conflict_risk = st.selectbox("유산 분쟁 예상 여부", ["높음 (유류분 청구 예상)", "보통", "낮음"])
     st.divider()
-    st.info("💡 지금 선택하시는 값에 따라 AI가 내부 DB에서 꺼내오는 전략이 실시간으로 바뀝니다.")
+    st.info("실제 제미나이 AI가 이 조건들과 내부 DB를 종합하여 답변을 생성합니다.")
 
-# 채팅 UI 로직
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -64,8 +61,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 사용자가 입력창에 글을 남겼을 때 실행되는 행동
-if prompt := st.chat_input("상담을 시작하려면 '분석 시작' 이라고 입력해 보세요."):
+if prompt := st.chat_input("상담을 시작하려면 문의 내용을 입력하세요."):
     
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -73,18 +69,33 @@ if prompt := st.chat_input("상담을 시작하려면 '분석 시작' 이라고 
     
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""
         
-        # 입력된 사이드바 조건(자산규모, 분쟁위험)을 바탕으로 자체 DB 검색 함수 실행
-        strategy_list = search_strategy(asset_value, conflict_risk)
+        # 자체 DB에서 조건에 맞는 데이터 검색
+        db_context = search_strategy(asset_value, conflict_risk)
         
-        # 검색된 결과를 문장으로 조립하여 화면에 타이핑 효과로 출력
-        simulated_response = "\n\n".join(strategy_list)
+        # AI에게 지시할 프롬프트 조립 (RAG 핵심 로직)
+        ai_prompt = f"""
+        당신은 상속/증여 전문 세무 컨설턴트입니다.
+        아래 제공된 [검색된 지식 DB] 내용만을 바탕으로 사용자의 질문에 답변하세요.
+        전문적이고 신뢰감 있는 말투를 사용하며, 고객의 상황에 맞는 전략을 자연스러운 문장으로 풀어서 설명해 주세요.
         
-        for chunk in simulated_response.split():
-            full_response += chunk + " "
-            time.sleep(0.05)
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
+        [고객 상황]
+        - 재산 규모: {asset_value}억원
+        - 분쟁 위험도: {conflict_risk}
+        
+        [검색된 지식 DB]
+        {db_context}
+        
+        사용자 질문: {prompt}
+        """
+        
+        try:
+            # 제미나이 AI에게 답변 생성 요청
+            response = model.generate_content(ai_prompt)
+            full_response = response.text
+            message_placeholder.markdown(full_response)
+        except Exception as e:
+            full_response = f"AI 연동 중 오류가 발생했습니다: {e}"
+            message_placeholder.markdown(full_response)
         
     st.session_state.messages.append({"role": "assistant", "content": full_response})
