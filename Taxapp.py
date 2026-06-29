@@ -7,7 +7,7 @@ from google import genai
 st.set_page_config(page_title="지능형 세무 판례 검색 AI", page_icon="⚖️", layout="wide")
 
 # API_KEY를 여기에 입력하세요
-API_KEY =st.secrets[AQ.Ab8RN6JfCaGlKEdQRBS0_p5-yLkd5pcbENGBMgLWDHnVzdc5Pw]
+API_KEY =st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 
 GENERATION_MODEL = 'gemini-2.5-flash'
