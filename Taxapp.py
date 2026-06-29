@@ -8,7 +8,7 @@ import design
 
 st.set_page_config(page_title="라온헤리티지연구소 세무 AI", page_icon="🏛️", layout="wide")
 
-API_KEY = st.secrets["GEMINI_API_KEY"]
+API_KEY = st.secrets["AQ.Ab8RN6JfCaGlKEdQRBS0_p5-yLkd5pcbENGBMgLWDHnVzdc5Pw"]
 client = genai.Client(api_key=API_KEY)
 
 GENERATION_MODEL = 'gemini-2.5-flash'
@@ -21,7 +21,6 @@ def cosine_similarity(a, b):
 @st.cache_data
 def load_pre_embedded_data():
     try:
-        # 압축된 476건의 데이터베이스 파일을 불러옵니다.
         df = pd.read_csv('tax_knowledge_db_embedded.csv.gz', encoding='utf-8-sig', engine='python', compression='gzip')
         df['Embedding'] = df['Embedding'].apply(lambda x: np.array(json.loads(x)))
         return df
@@ -30,7 +29,7 @@ def load_pre_embedded_data():
         st.stop()
 
 # ==========================================
-# 사이드바 (고객 사전 문진표 및 로고)
+# 사이드바 (고객 사전 문진표)
 # ==========================================
 with st.sidebar:
     if os.path.exists("logo.png"):
@@ -74,37 +73,67 @@ for turn in st.session_state.chat_history:
 
 if prompt := st.chat_input("상담 내용을 입력하세요 (예: 상가를 먼저 증여하는게 나을까요, 상속이 나을까요?)"):
     
-    query_result = client.models.embed_content(model=EMBEDDING_MODEL, contents=prompt)
-    query_emb = query_result.embeddings[0].values
-    db['유사도'] = db['Embedding'].apply(lambda x: cosine_similarity(query_emb, x))
-    retrieved = db.sort_values(by='유사도', ascending=False).head(2)
+    # [새로운 기능 1] AI 문지기를 통한 토큰 낭비 방지 (비용 방어)
+    gate_prompt = f"다음 질문이 세무, 회계, 상속, 증여, 절세 플랜, 재무 컨설팅과 관련된 질문인지 판별하세요. 맞으면 'O', 전혀 엉뚱한 질문이면 'X'만 출력하세요.\n질문: {prompt}"
+    gate_res = client.models.generate_content(model=GENERATION_MODEL, contents=gate_prompt)
     
-    raw_cases = ""
-    for i, row in retrieved.iterrows():
-        raw_cases += f"사건명: {row['사건명']}\n쟁점: {row.get('쟁점분류','')}\n법령: {row.get('관련법령','')}\n요지: {row['판결요지']}\n\n"
+    if "X" in gate_res.text.upper():
+        # 엉뚱한 질문일 경우 정중하게 거절하고 아래의 복잡한 로직을 전부 패스합니다.
+        reject_msg = "안녕하세요, 라온헤리티지연구소입니다. 죄송하지만 저는 상속, 증여, 양도 등 세무 및 절세 플랜 컨설팅에 특화된 AI입니다. 세무와 관련된 질문을 남겨주시면 전문적인 판례와 함께 최선을 다해 답변해 드리겠습니다."
+        cases_html = "<div style='padding:20px; color:#64748b; font-size:14px; background-color:#f8fafc; border-radius:8px;'>해당 질문은 세무 컨설팅과 관련이 없어 판례 검색이 생략되었습니다.</div>"
         
-    ui_prompt = design.get_case_card_prompt(raw_cases) 
-    ui_response = client.models.generate_content(model=GENERATION_MODEL, contents=ui_prompt)
-    cases_html = ui_response.text.replace("```html", "").replace("```", "")
-    
-    context = "\n\n".join([f"- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}" for _, row in retrieved.iterrows()])
-    
-    # 세 개의 정보를 design.py로 넘겨줍니다.
-    ai_prompt = design.get_assistant_prompt(context, prompt, user_profile) 
-    ai_response = client.models.generate_content(model=GENERATION_MODEL, contents=ai_prompt)
-    assistant_reply = ai_response.text
-    
-    with st.container():
-        col1, col2 = st.columns([5, 5])
-        with col1:
-            with st.chat_message("user"): st.markdown(prompt)
-            with st.chat_message("assistant"): st.markdown(assistant_reply)
-        with col2:
-            st.markdown(cases_html, unsafe_allow_html=True)
-    st.markdown("---")
-    
-    st.session_state.chat_history.append({
-        "user": prompt,
-        "assistant": assistant_reply,
-        "cases_html": cases_html
-    })
+        with st.container():
+            col1, col2 = st.columns([5, 5])
+            with col1:
+                with st.chat_message("user"): st.markdown(prompt)
+                with st.chat_message("assistant"): st.markdown(reject_msg)
+            with col2:
+                st.markdown(cases_html, unsafe_allow_html=True)
+        st.markdown("---")
+        
+        st.session_state.chat_history.append({
+            "user": prompt,
+            "assistant": reject_msg,
+            "cases_html": cases_html
+        })
+        
+    else:
+        # [새로운 기능 2] 답변 생성 중 로딩 문구 표시
+        with st.spinner("AI가 관련 판례와 최적의 맞춤형 절세 플랜을 분석 중입니다. 잠시만 기다려주세요..."):
+            
+            # 검색 및 판례 요약 (무거운 작업)
+            query_result = client.models.embed_content(model=EMBEDDING_MODEL, contents=prompt)
+            query_emb = query_result.embeddings[0].values
+            db['유사도'] = db['Embedding'].apply(lambda x: cosine_similarity(query_emb, x))
+            retrieved = db.sort_values(by='유사도', ascending=False).head(2)
+            
+            raw_cases = ""
+            for i, row in retrieved.iterrows():
+                raw_cases += f"사건명: {row['사건명']}\n쟁점: {row.get('쟁점분류','')}\n법령: {row.get('관련법령','')}\n요지: {row['판결요지']}\n\n"
+                
+            ui_prompt = design.get_case_card_prompt(raw_cases) 
+            ui_response = client.models.generate_content(model=GENERATION_MODEL, contents=ui_prompt)
+            cases_html = ui_response.text.replace("```html", "").replace("```", "")
+            
+            context = "\n\n".join([f"- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}" for _, row in retrieved.iterrows()])
+            
+            # 최종 답변 생성
+            ai_prompt = design.get_assistant_prompt(context, prompt, user_profile) 
+            ai_response = client.models.generate_content(model=GENERATION_MODEL, contents=ai_prompt)
+            assistant_reply = ai_response.text
+        
+        # 스피너(로딩)가 끝나면 화면에 결과를 그려줍니다.
+        with st.container():
+            col1, col2 = st.columns([5, 5])
+            with col1:
+                with st.chat_message("user"): st.markdown(prompt)
+                with st.chat_message("assistant"): st.markdown(assistant_reply)
+            with col2:
+                st.markdown(cases_html, unsafe_allow_html=True)
+        st.markdown("---")
+        
+        st.session_state.chat_history.append({
+            "user": prompt,
+            "assistant": assistant_reply,
+            "cases_html": cases_html
+        })
