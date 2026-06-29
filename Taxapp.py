@@ -30,7 +30,7 @@ def load_pre_embedded_data():
         st.error(f"데이터 로드 실패: 공장 스크립트(make_db.py)가 정상적으로 완료되었는지 확인해주세요. / 에러: {e}")
         st.stop()
 
-st.title("⚖️ 지능형 세무 판례 검색 AI (광속 로딩 버전)")
+st.title("⚖️ Raon Heritage Tax AI")
 
 # 앱이 켜질 때 단 1초 만에 완료되는 구간입니다.
 with st.spinner('사전 학습된 데이터베이스를 불러오는 중입니다...'):
