@@ -4,9 +4,13 @@ def apply_premium_css():
     """스트림릿 기본 UI를 덮어쓰는 프리미엄 CSS 강제 주입"""
     custom_css = """
     <style>
+    /* 1. 상단 스트림릿 메인 메뉴만 숨기기 (헤더 통째로 숨기지 않음) */
     #MainMenu {visibility: hidden;}
-    header[data-testid="stHeader"] {visibility: hidden;} 
     
+    /* 2. 사이드바 토글 버튼(가장 중요)은 건드리지 않음! */
+    /* header[data-testid="stHeader"] {visibility: hidden;} <- 이 줄을 삭제하세요! */
+    
+    /* 3. 나머지는 그대로 유지 */
     footer {visibility: hidden;}
     .stAppDeployButton {display: none;}
     .stApp {background-color: #f4f6f9;}
