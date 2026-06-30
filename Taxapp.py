@@ -73,7 +73,7 @@ for turn in st.session_state.chat_history:
             st.markdown(turn["cases_html"], unsafe_allow_html=True)
     st.markdown("---")
 
-if prompt := st.chat_input("상담 내용을 입력하세요 (예: 상가를 먼저 증여하는게 나을까요, 상속이 나을까요?)"):
+if prompt := st.chat_input("상담 내용을 입력하세요"):
     
     # [새로운 기능 1] AI 문지기를 통한 토큰 낭비 방지 (비용 방어)
     gate_prompt = f"다음 질문이 세무, 회계, 상속, 증여, 절세 플랜, 재무 컨설팅과 관련된 질문인지 판별하세요. 맞으면 'O', 전혀 엉뚱한 질문이면 'X'만 출력하세요.\n질문: {prompt}"
@@ -103,26 +103,30 @@ if prompt := st.chat_input("상담 내용을 입력하세요 (예: 상가를 먼
         # [새로운 기능 2] 답변 생성 중 로딩 문구 표시
         with st.spinner("AI가 관련 판례와 최적의 맞춤형 절세 플랜을 분석 중입니다. 잠시만 기다려주세요..."):
             
-            # 검색 및 판례 요약 (무거운 작업)
+            # 검색 (임베딩)
             query_result = client.models.embed_content(model=EMBEDDING_MODEL, contents=prompt)
             query_emb = query_result.embeddings[0].values
             db['유사도'] = db['Embedding'].apply(lambda x: cosine_similarity(query_emb, x))
             retrieved = db.sort_values(by='유사도', ascending=False).head(2)
             
-            raw_cases = ""
-            for i, row in retrieved.iterrows():
-                raw_cases += f"사건명: {row['사건명']}\n쟁점: {row.get('쟁점분류','')}\n법령: {row.get('관련법령','')}\n요지: {row['판결요지']}\n\n"
-                
-            ui_prompt = design.get_case_card_prompt(raw_cases) 
-            ui_response = client.models.generate_content(model=GENERATION_MODEL, contents=ui_prompt)
-            cases_html = ui_response.text.replace("```html", "").replace("```", "")
-            
+            # 원문 취합
             context = "\n\n".join([f"- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}" for _, row in retrieved.iterrows()])
             
-            # 최종 답변 생성
-            ai_prompt = design.get_assistant_prompt(context, prompt, user_profile) 
-            ai_response = client.models.generate_content(model=GENERATION_MODEL, contents=ai_prompt)
-            assistant_reply = ai_response.text
+            # 🚀 단 1번의 호출로 요약 HTML과 답변 텍스트를 동시에 받아옵니다!
+            unified_prompt = design.get_unified_prompt(context, prompt, user_profile)
+            response = client.models.generate_content(model=GENERATION_MODEL, contents=unified_prompt)
+            
+            # 받아온 대답을 ===SPLIT=== 특수문자 기준으로 자릅니다.
+            parts = response.text.split("===SPLIT===")
+            
+            if len(parts) >= 2:
+                # 앞부분은 판례 요약 HTML, 뒷부분은 메인 답변 텍스트
+                cases_html = parts[0].strip().replace("```html", "").replace("```", "")
+                assistant_reply = parts[1].strip()
+            else:
+                # 만약 AI가 실수로 안 잘라주면 에러 처리
+                cases_html = "<div style='padding:20px; color:#991b1b;'>판례 요약 렌더링 중 오류가 발생했습니다.</div>"
+                assistant_reply = response.text
         
         # 스피너(로딩)가 끝나면 화면에 결과를 그려줍니다.
         with st.container():
@@ -133,9 +137,3 @@ if prompt := st.chat_input("상담 내용을 입력하세요 (예: 상가를 먼
             with col2:
                 st.markdown(cases_html, unsafe_allow_html=True)
         st.markdown("---")
-        
-        st.session_state.chat_history.append({
-            "user": prompt,
-            "assistant": assistant_reply,
-            "cases_html": cases_html
-        })
