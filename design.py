@@ -62,7 +62,7 @@ def get_unified_prompt(context, user_query, user_profile):
     <div style="background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 5px solid #1e3a8a; margin-bottom: 24px; font-family: 'Malgun Gothic', sans-serif;">
         <h3 style="color: #1e3a8a; font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">⚖️ [사건명]</h3>
         <div style="margin-bottom: 10px;">
-            <span style="background-color: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px; margin-right: 8px;">쉬운 요약</span>
+            <span style="background-color: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px; margin-right: 8px;">판례 요약</span>
             <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-top: 8px;">[여기에 비전문가용 쉬운 요약 3줄 작성]</p>
         </div>
         <div>
@@ -76,5 +76,5 @@ def get_unified_prompt(context, user_query, user_profile):
     [파트 2: 컨설턴트 답변 (Markdown)]
     - "라온헤리티지연구소 AI 컨설턴트입니다."로 시작.
     - 판례의 논리를 바탕으로 논리적이고 정중하게 브리핑.
-    - 당장 실행해야 할 '액션 플랜' 2~3가지를 글머리 기호로 제시.
+    - 제안 드리는 플랜' 2~3가지를 글머리 기호로 제시.
     """
