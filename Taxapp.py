@@ -7,8 +7,8 @@ from google import genai
 import design
 
 st.set_page_config(
-    page_title="라온헤리티지연구소 세무 AI", 
-    page_icon="🏛️", 
+    page_title="라온헤리티지연구소 세무 AI",
+    page_icon="🏛️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
