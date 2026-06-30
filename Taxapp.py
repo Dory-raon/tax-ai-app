@@ -15,13 +15,24 @@ st.set_page_config(
 
 design.apply_premium_css()
 
-st.markdown("""
-    <style>
-        [data-testid="stSidebar"] {
-            display: flex !important;
-            min-width: 300px !important;
-        }
-    </style>
+st.markdown(f"""
+    <div style="
+        position: relative; 
+        padding: 40px; 
+        background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                    url('https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo.png');
+        background-size: contain;
+        background-position: right 20px center;
+        background-repeat: no-repeat;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    ">
+        <h1 style="color: #1e3a8a; font-size: 42px; margin: 0;">라온헤리티지연구소<br>상속/증여 컨설팅 AI</h1>
+        <p style="color: #475569; font-size: 18px; margin-top: 10px;">
+            축적된 판례를 바탕으로 최적의 솔루션을 제공합니다.
+        </p>
+    </div>
 """, unsafe_allow_html=True)
 
 API_KEY = st.secrets["GEMINI_API_KEY"]
