@@ -214,7 +214,7 @@ display: none;
 <div class="fixed-header">
 <div class="header-left">
 <img src="{icon_url}" style="width: 100px; height: 100px; border-radius: 15px; margin-right: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0;">
-<h1 style="margin: 0; color: #1e3a8a; font-size: 26px; font-weight: 800; letter-spacing: -1px; white-space: nowrap; flex-shrink: 0;">라온헤리티지연구소 컨설팅 AI</h1>
+<h1 style="margin: 0; color: #1e3a8a; font-size: 26px; font-weight: 800; letter-spacing: -1px; white-space: nowrap; flex-shrink: 0;">라온헤리티지연구소 Taxroid</h1>
 </div>
 <div class="header-right">
 <img src="{logo_horizontal_url}" style="height: 55px; flex-shrink: 0;">
@@ -223,7 +223,7 @@ display: none;
 
 st.markdown(html_code, unsafe_allow_html=True)
 
-st.markdown("<p style='color: #475569; font-size: 20px; margin-bottom: 40px;'>사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례를 바탕으로 최적의 솔루션을 제공합니다.</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #475569; font-size: 20px; margin-bottom: 40px;'>사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례와 노하우를 바탕으로 최적의 솔루션을 제공합니다.</p>", unsafe_allow_html=True)
 with st.spinner('지식 데이터베이스를 불러오는 중입니다...'):
     db = load_pre_embedded_data()
 
