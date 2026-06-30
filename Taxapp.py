@@ -7,8 +7,12 @@ from google import genai
 import design 
 
 # 딱 한 줄로 로컬 파일을 불러와서 설정합니다. (여기에 'favicon.jpg' 파일이 있어야 합니다)
-st.set_page_config(page_title="라온헤리티지연구소 세무 AI", page_icon="favicon.jpg", layout="wide")
-
+st.set_page_config(
+    page_title="RAON AI", 
+    page_icon=custom_icon, 
+    layout="wide", 
+    initial_sidebar_state="expanded"  # <--- 이 옵션이 사이드바를 펼친 상태로 고정합니다.
+)
 design.apply_premium_css()
 
 API_KEY = st.secrets["GEMINI_API_KEY"]
