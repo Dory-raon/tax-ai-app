@@ -59,6 +59,6 @@ def get_fast_prompt(context, user_query, user_profile, num_cases):
     2. 오직 당신이 창작한 '요약문', '시사점', '최종 답변'만 아래 양식에 맞춰 짧고 굵게 출력하세요.
     3. 각 파트를 나누는 "===SPLIT===" 기호를 정확히 기입하세요.
 
-    {split_format}라온헤리티지연구소 수석 컨설턴트입니다.
+    {split_format}라온헤리티지연구소 AI 컨설턴트입니다.
     (이하 메인 컨설팅 답변 및 라온헤리티지연구소가 제안 드리는 플랜 2~3가지 작성)
     """
