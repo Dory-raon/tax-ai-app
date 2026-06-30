@@ -175,7 +175,6 @@ logo_horizontal_url = f"https://raw.githubusercontent.com/{github_user}/{repo_na
 
 st.markdown(f"""
     <style>
-    /* 1. 화면 위쪽 텅 빈 여백을 위로 바싹 끌어올리기 */
     .block-container {{
         padding-top: 2rem !important;
     }}
@@ -183,7 +182,6 @@ st.markdown(f"""
         padding-top: 2rem !important;
     }}
     
-    /* 2. 틀고정(Sticky) 헤더 디자인 */
     .fixed-header {{
         position: sticky;
         top: 0px; 
@@ -191,14 +189,14 @@ st.markdown(f"""
         backdrop-filter: blur(8px); 
         z-index: 9999; 
         display: flex;
-        justify-content: space-between; /* 양쪽 끝으로 요소들을 밀어내기 (핵심!) */
+        justify-content: space-between; 
         align-items: center;
         padding: 15px 30px;
-        margin-top: -2rem; /* 화면 천장에 바싹 붙이기 */
+        margin-top: -2rem; 
         margin-bottom: 30px;
         border-bottom: 1px solid #e2e8f0;
-        box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); /* 스크롤할 때 입체감 나는 그림자 */
-        border-radius: 0 0 15px 15px; /* 아래쪽 모서리만 살짝 둥글게 */
+        box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); 
+        border-radius: 0 0 15px 15px;
     }}
     
     .header-left {{
@@ -206,22 +204,19 @@ st.markdown(f"""
         align-items: center;
     }}
     
-    /* 기본 헤더(우측 상단 햄버거 메뉴 등) 숨기기 */
     header[data-testid="stHeader"] {{
         display: none;
     }}
     </style>
 
     <div class="fixed-header">
-        <!-- 왼쪽 파트: 아이콘 + 컨설팅 AI 제목 -->
         <div class="header-left">
-            <img src="{icon_url}" style="width: 45px; height: 45px; border-radius: 10px; margin-right: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h1 style="margin: 0; color: #1e3a8a; font-size: 24px; font-weight: 800; letter-spacing: -1px;">라온헤리티지연구소 상속·증여 컨설팅 AI</h1>
+            <img src="{icon_url}" style="width: 75px; height: 75px; border-radius: 12px; margin-right: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h1 style="margin: 0; color: #1e3a8a; font-size: 28px; font-weight: 800; letter-spacing: -1px; white-space: nowrap;">라온헤리티지연구소 상속·증여 컨설팅 AI</h1>
         </div>
         
-        <!-- 오른쪽 파트: 가로형 회사 로고 -->
         <div>
-            <img src="{logo_horizontal_url}" style="height: 40px;">
+            <img src="{logo_horizontal_url}" style="height: 50px;">
         </div>
     </div>
 """, unsafe_allow_html=True)
