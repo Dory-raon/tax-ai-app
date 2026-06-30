@@ -61,13 +61,13 @@ repo_name = "tax-ai-app" # 레포지토리 이름
 logo_url = f"https://raw.githubusercontent.com/{github_user}/{repo_name}/main/favicon.jpg"
 
 st.markdown(f"""
-    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-        <img src="{logo_url}" width="60" style="margin-right: 15px; border-radius: 8px;">
-        <h1 style="margin: 0; color: #1e3a8a; font-size: 36px;">라온헤리티지연구소 상속/증여 컨설팅 AI</h1>
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="{logo_url}" width="80" style="margin-right: 20px; border-radius: 12px;">
+        <h1 style="margin: 0; color: #1e3a8a; font-size: 42px; line-height: 1.2;">라온헤리티지연구소<br>상속/증여 컨설팅 AI</h1>
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<p style='color: #475569; font-size: 18px; margin-bottom: 30px;'>사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례를 바탕으로 최적의 솔루션을 제공합니다.</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #475569; font-size: 20px; margin-bottom: 40px;'>사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례를 바탕으로 최적의 솔루션을 제공합니다.</p>", unsafe_allow_html=True)
 with st.spinner('지식 데이터베이스를 불러오는 중입니다...'):
     db = load_pre_embedded_data()
 
