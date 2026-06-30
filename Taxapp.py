@@ -17,13 +17,16 @@ design.apply_premium_css()
 
 st.markdown("""
     <div style="display: flex; align-items: center; padding: 20px 30px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #1e3a8a; margin-bottom: 30px;">
-        <!-- 가로로 편집한 새로운 로고 이미지 경로를 넣으세요 -->
-        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo_horizontal.png" alt="라온헤리티지 로고" style="height: 55px; margin-right: 30px;">
         
+        <!-- 기존 세로형 로고(logo.png)를 가져오되, 크기를 알맞게 줄여서 왼쪽에 배치 -->
+        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo.png" style="height: 70px; margin-right: 30px;">
+        
+        <!-- 로고와 제목 사이의 세로 선 및 텍스트 영역 -->
         <div style="border-left: 2px solid #e2e8f0; padding-left: 30px;">
             <h1 style="margin: 0; color: #1e3a8a; font-size: 34px; letter-spacing: -1px;">상속/증여 컨설팅 AI</h1>
             <p style="margin: 5px 0 0 0; color: #64748b; font-size: 16px;">회계법인 라온 부설 라온헤리티지연구소</p>
         </div>
+        
     </div>
 """, unsafe_allow_html=True)
 
