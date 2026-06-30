@@ -99,9 +99,9 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
             "cases_html": cases_html
         })
         
-    else:
+   else:
         # [새로운 기능 2] 답변 생성 중 로딩 문구 표시
-        with st.spinner("AI가 관련 판례와 최적의 맞춤형 절세 플랜을 분석 중입니다. 잠시만 기다려주세요..."):
+        with st.spinner("AI가 쾌속으로 판례를 요약하고 맞춤형 절세 플랜을 작성 중입니다..."):
             
             # 검색 (임베딩)
             query_result = client.models.embed_content(model=EMBEDDING_MODEL, contents=prompt)
@@ -109,26 +109,48 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
             db['유사도'] = db['Embedding'].apply(lambda x: cosine_similarity(query_emb, x))
             retrieved = db.sort_values(by='유사도', ascending=False).head(2)
             
-            # 원문 취합
-            context = "\n\n".join([f"- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}" for _, row in retrieved.iterrows()])
+            # 원문 취합 (AI한테 넘겨줄 용도)
+            context = ""
+            for i, (_, row) in enumerate(retrieved.iterrows()):
+                context += f"[판례 {i+1}]\n- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}\n\n"
             
-            # 🚀 단 1번의 호출로 요약 HTML과 답변 텍스트를 동시에 받아옵니다!
-            unified_prompt = design.get_unified_prompt(context, prompt, user_profile)
-            response = client.models.generate_content(model=GENERATION_MODEL, contents=unified_prompt)
+            # 🚀 AI에게는 쓸데없는 거 빼고 '요약'과 '답변' 글자만 짧게 뽑으라고 시킵니다!
+            fast_prompt = design.get_fast_prompt(context, prompt, user_profile, len(retrieved))
+            response = client.models.generate_content(model=GENERATION_MODEL, contents=fast_prompt)
             
-            # 받아온 대답을 ===SPLIT=== 특수문자 기준으로 자릅니다.
+            # AI가 빠르게 내뱉은 답변 자르기
             parts = response.text.split("===SPLIT===")
+            cases_html = ""
             
-            if len(parts) >= 2:
-                # 앞부분은 판례 요약 HTML, 뒷부분은 메인 답변 텍스트
-                cases_html = parts[0].strip().replace("```html", "").replace("```", "")
-                assistant_reply = parts[1].strip()
+            # AI가 준 요약문 + 파이썬이 들고 있던 원문 + HTML 껍데기를 0.001초만에 순식간에 조립!
+            if len(parts) >= len(retrieved) + 1:
+                for i, (_, row) in enumerate(retrieved.iterrows()):
+                    # AI가 짧게 만들어준 요약문
+                    summary_text = parts[i].strip().replace('\n', '<br>')
+                    # 파이썬이 갖고 있던 진짜 원문
+                    original_text = row['판결요지'].replace('\n', '<br>')
+                    
+                    cases_html += f"""
+                    <div style="background: #ffffff; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 5px solid #1e3a8a; margin-bottom: 24px; font-family: 'Malgun Gothic', sans-serif;">
+                        <h3 style="color: #1e3a8a; font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">⚖️ {row['사건명']}</h3>
+                        <div style="margin-bottom: 10px; background-color: #f8fafc; padding: 15px; border-radius: 8px;">
+                            <p style="color: #334155; font-size: 14px; line-height: 1.6; margin: 0;"><b>[핵심 요약 및 시사점]</b><br><br>{summary_text}</p>
+                        </div>
+                        <details style="margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+                            <summary style="cursor: pointer; color: #1e3a8a; font-weight: bold; font-size: 13px;">🔍 판례 원문 보기 (클릭하여 펼치기)</summary>
+                            <div style="margin-top: 10px; background-color: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <p style="color: #64748b; font-size: 12px; line-height: 1.6; margin: 0;">{original_text}</p>
+                            </div>
+                        </details>
+                    </div>
+                    """
+                # 마지막 파트는 메인 답변
+                assistant_reply = parts[-1].strip()
             else:
-                # 만약 AI가 실수로 안 잘라주면 에러 처리
-                cases_html = "<div style='padding:20px; color:#991b1b;'>판례 요약 렌더링 중 오류가 발생했습니다.</div>"
+                cases_html = "<div style='padding:20px; color:#991b1b;'>결과를 처리하는 중 오류가 발생했습니다.</div>"
                 assistant_reply = response.text
         
-        # 스피너(로딩)가 끝나면 화면에 결과를 그려줍니다.
+        # 화면에 즉시 렌더링
         with st.container():
             col1, col2 = st.columns([5, 5])
             with col1:
@@ -137,3 +159,10 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
             with col2:
                 st.markdown(cases_html, unsafe_allow_html=True)
         st.markdown("---")
+        
+        # 채팅 기록 저장
+        st.session_state.chat_history.append({
+            "user": prompt,
+            "assistant": assistant_reply,
+            "cases_html": cases_html
+        })
