@@ -4,48 +4,29 @@ def apply_premium_css():
     """스트림릿 기본 UI를 덮어쓰는 프리미엄 CSS 강제 주입"""
     custom_css = """
     <style>
-    /* 페이지 배경에 로고를 은은하게 배치 */
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo.png");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: 400px; /* 로고 크기 조정 */
-        background-attachment: fixed;
-        opacity: 0.95; /* 전체 앱의 배경 느낌을 유지 */
-    }
-    
-    /* 로고가 들어간 배경 위에 흰색 반투명 레이어를 깔아 가독성 확보 */
-    .stApp::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(255, 255, 255, 0.8); /* 0.85가 진할수록 글자가 잘 보임 */
-        z-index: -1;
-    }
-    </style>
-    """
-    """
-    <style>
-    /* 1. 상단 스트림릿 메인 메뉴만 숨기기 (헤더 통째로 숨기지 않음) */
+    /* 상단 스트림릿 메인 메뉴만 숨기기 */
     #MainMenu {visibility: hidden;}
     
-    /* 2. 사이드바 토글 버튼(가장 중요)은 건드리지 않음! */
-    /* header[data-testid="stHeader"] {visibility: hidden;} <- 이 줄을 삭제하세요! */
-    
-    /* 3. 나머지는 그대로 유지 */
+    /* 기본 UI 숨김 및 배경색 설정 */
     footer {visibility: hidden;}
     .stAppDeployButton {display: none;}
     .stApp {background-color: #f4f6f9;}
+    
+    /* 사이드바 스타일 설정 */
     [data-testid="stSidebar"] {
         background-color: #ffffff;
         border-right: 1px solid #e2e8f0;
         box-shadow: 2px 0 10px rgba(0,0,0,0.03);
     }
+    
+    /* 채팅 입력창 스타일 */
     .stChatInputContainer {
         border-radius: 15px !important;
         border: 1px solid #cbd5e1 !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
     }
+    
+    /* 제목 색상 */
     h1, h2, h3 {color: #1e3a8a !important;}
     
     /* details(아코디언) 태그 클릭 시 외곽선 없애기 */
