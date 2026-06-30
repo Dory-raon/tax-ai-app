@@ -16,12 +16,10 @@ st.set_page_config(
 design.apply_premium_css()
 
 st.markdown("""
-    <div style="display: flex; align-items: center; padding: 20px 30px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #1e3a8a; margin-bottom: 30px;">
-        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo_horizontal.png" style="height: 70px; margin-right: 30px;">
-        <div style="border-left: 2px solid #e2e8f0; padding-left: 30px;">
-            <h1 style="margin: 0; color: #1e3a8a; font-size: 34px; letter-spacing: -1px;">상속/증여 컨설팅 AI</h1>
-            <p style="margin: 5px 0 0 0; color: #64748b; font-size: 16px;">회계법인 라온 부설 라온헤리티지연구소</p>
-        </div>
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 50px;">
+        <!-- 로고만 엄청 크게, 가운데 정렬, 살짝 반투명하게 스며들도록 설정 -->
+        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo_horizontal.png" 
+             style="max-width: 800px; width: 85%; height: auto; opacity: 0.9;">
     </div>
 """, unsafe_allow_html=True)
 
