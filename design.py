@@ -4,6 +4,28 @@ def apply_premium_css():
     """스트림릿 기본 UI를 덮어쓰는 프리미엄 CSS 강제 주입"""
     custom_css = """
     <style>
+    /* 페이지 배경에 로고를 은은하게 배치 */
+    .stApp {
+        background-image: url("https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo.png");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 400px; /* 로고 크기 조정 */
+        background-attachment: fixed;
+        opacity: 0.95; /* 전체 앱의 배경 느낌을 유지 */
+    }
+    
+    /* 로고가 들어간 배경 위에 흰색 반투명 레이어를 깔아 가독성 확보 */
+    .stApp::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.85); /* 0.85가 진할수록 글자가 잘 보임 */
+        z-index: -1;
+    }
+    </style>
+    """
+    """
+    <style>
     /* 1. 상단 스트림릿 메인 메뉴만 숨기기 (헤더 통째로 숨기지 않음) */
     #MainMenu {visibility: hidden;}
     
