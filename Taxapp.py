@@ -173,52 +173,53 @@ repo_name = "tax-ai-app"
 icon_url = f"https://raw.githubusercontent.com/{github_user}/{repo_name}/main/favicon.jpg"
 logo_horizontal_url = f"https://raw.githubusercontent.com/{github_user}/{repo_name}/main/logo_horizontal.png"
 
-# 들여쓰기(띄어쓰기)로 인한 텍스트 노출 오류를 막기 위해 왼쪽 여백을 완전히 없앴습니다!
-html_code = f"""
-<style>
+html_code = f"""<style>
 .block-container {{ padding-top: 2rem !important; }}
 .stMainBlockContainer {{ padding-top: 2rem !important; }}
 
 .fixed-header {{
-    position: sticky;
-    top: 0px; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(8px); 
-    z-index: 9999; 
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 15px 30px;
-    margin-top: -2rem; 
-    margin-bottom: 30px;
-    border-bottom: 1px solid #e2e8f0;
-    box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); 
-    border-radius: 0 0 15px 15px;
+position: sticky;
+top: 0px; 
+background: rgba(255, 255, 255, 0.95); 
+backdrop-filter: blur(8px); 
+z-index: 9999; 
+display: flex;
+justify-content: space-between; 
+align-items: center;
+padding: 15px 30px;
+margin-top: -2rem; 
+margin-bottom: 30px;
+border-bottom: 1px solid #e2e8f0;
+box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.05); 
+border-radius: 0 0 15px 15px;
+width: 100%;
 }}
 
 .header-left {{
-    display: flex;
-    align-items: center;
+display: flex;
+align-items: center;
+flex-shrink: 0;
+}}
+
+.header-right {{
+display: flex;
+align-items: center;
+flex-shrink: 0;
 }}
 
 header[data-testid="stHeader"] {{
-    display: none;
+display: none;
 }}
 </style>
-
 <div class="fixed-header">
-    <div class="header-left">
-        <!-- 아이콘 크기를 100px로 엄청 키웠습니다 -->
-        <img src="{icon_url}" style="width: 100px; height: 100px; border-radius: 15px; margin-right: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h1 style="margin: 0; color: #1e3a8a; font-size: 30px; font-weight: 800; letter-spacing: -1px; white-space: nowrap;">라온헤리티지연구소 컨설팅 AI</h1>
-    </div>
-    
-    <div>
-        <!-- 에러가 나던 회사 로고 영역도 띄어쓰기를 없애 완벽히 해결 -->
-        <img src="{logo_horizontal_url}" style="height: 55px;">
-    </div>
+<div class="header-left">
+<img src="{icon_url}" style="width: 100px; height: 100px; border-radius: 15px; margin-right: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0;">
+<h1 style="margin: 0; color: #1e3a8a; font-size: 26px; font-weight: 800; letter-spacing: -1px; white-space: nowrap; flex-shrink: 0;">라온헤리티지연구소 컨설팅 AI</h1>
 </div>
-"""
+<div class="header-right">
+<img src="{logo_horizontal_url}" style="height: 55px; flex-shrink: 0;">
+</div>
+</div>"""
 
 st.markdown(html_code, unsafe_allow_html=True)
 
