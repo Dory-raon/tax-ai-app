@@ -2,10 +2,12 @@ import streamlit as st
 
 def apply_premium_css():
     """스트림릿 기본 UI를 덮어쓰는 프리미엄 CSS 강제 주입"""
-    custom_css = """
+      custom_css = """
     <style>
     #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
+    /* header 전체를 숨기지 말고, 스트림릿 메뉴만 숨기기 */
+    header[data-testid="stHeader"] {visibility: hidden;} 
+    
     footer {visibility: hidden;}
     .stAppDeployButton {display: none;}
     .stApp {background-color: #f4f6f9;}
