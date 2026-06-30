@@ -72,8 +72,8 @@ def prev_step():
     if st.session_state.step > 1: st.session_state.step -= 1
 
 with st.sidebar:
-    st.markdown("## 📋 맞춤형 절세 플래너")
-    st.markdown("<p style='font-size: 13px; color: #64748b;'>양도/취득세까지 고려한 완벽한 플랜을 위해 4단계 문진을 진행합니다.</p>", unsafe_allow_html=True)
+    st.markdown("## 📋 맞춤형 세무전략 플래너")
+    st.markdown("<p style='font-size: 13px; color: #64748b;'>고객님의 상황을 고려한 완벽한 플랜을 위해 4단계 문진을 진행합니다.</p>", unsafe_allow_html=True)
     
     # 상단 진행률 표시 (4단계 기준)
     progress_val = int((st.session_state.step / 4) * 100)
@@ -134,7 +134,10 @@ with st.sidebar:
         with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
         with col2: 
             if st.button("✅ 입력 완료", use_container_width=True):
-                st.success("준비가 완료되었습니다! 우측 하단 채팅창에 질문을 남겨주세요.")
+                # 좁은 success 대신 우측 하단에 세련된 팝업 띄우기
+                st.toast("준비가 완료되었습니다! 우측 하단 채팅창에 질문을 남겨주세요.", icon="🎉")
+                # (선택) 시각적인 재미를 위해 풍선 이펙트를 넣고 싶다면 아래 주석을 푸세요
+                # st.balloons() 
 
 # AI가 참조할 프로필 문자열 (양도/취득세/메모 내용 포함)
 user_profile = f"""
