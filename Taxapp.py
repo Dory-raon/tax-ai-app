@@ -6,14 +6,21 @@ import os
 from google import genai
 import design 
 
-# 딱 한 줄로 로컬 파일을 불러와서 설정합니다. (여기에 'favicon.jpg' 파일이 있어야 합니다)
 st.set_page_config(
-    page_title="RAON AI", 
-    page_icon=custom_icon, 
-    layout="wide", 
-    initial_sidebar_state="expanded"  # <--- 이 옵션이 사이드바를 펼친 상태로 고정합니다.
+    page_title="라온헤리티지연구소 세무 AI", 
+    page_icon="🏛️", 
+    layout="wide",
+    initial_sidebar_state="expanded" # 사이드바가 항상 보이도록 강제 고정
 )
+
 design.apply_premium_css()
+
+# 사이드바 강제 고정 CSS 추가 (혹시 모를 숨김 방지)
+st.markdown("""
+    <style>
+        [data-testid="stSidebar"] { min-width: 300px !important; }
+    </style>
+""", unsafe_allow_html=True)
 
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
