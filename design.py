@@ -2,10 +2,9 @@ import streamlit as st
 
 def apply_premium_css():
     """스트림릿 기본 UI를 덮어쓰는 프리미엄 CSS 강제 주입"""
-      custom_css = """
+    custom_css = """
     <style>
     #MainMenu {visibility: hidden;}
-    /* header 전체를 숨기지 말고, 스트림릿 메뉴만 숨기기 */
     header[data-testid="stHeader"] {visibility: hidden;} 
     
     footer {visibility: hidden;}
@@ -52,7 +51,7 @@ def get_fast_prompt(context, user_query, user_profile, num_cases):
 
     ======================================
     [🔥 출력 규칙 - ⚠️ 속도를 위해 반드시 지킬 것 ⚠️]
-    1. 당신은 절대로 HTML 코드, CSS 디자인, 사건명, 판례 원문을 다시 타이핑하지 마세요! (출력 속도를 심각하게 늦춥니다)
+    1. 당신은 절대로 HTML 코드, CSS 디자인, 사건명, 판례 원문을 다시 타이핑하지 마세요!
     2. 오직 당신이 창작한 '요약문', '시사점', '최종 답변'만 아래 양식에 맞춰 짧고 굵게 출력하세요.
     3. 각 파트를 나누는 "===SPLIT===" 기호를 정확히 기입하세요.
 
