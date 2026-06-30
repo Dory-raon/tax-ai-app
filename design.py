@@ -33,7 +33,7 @@ def get_fast_prompt(context, user_query, user_profile, num_cases):
     """극강의 속도를 위해 AI에게는 딱 필요한 내용만 짧게 생성하도록 강제하는 프롬프트"""
     split_format = ""
     for i in range(1, num_cases + 1):
-        split_format += f"[판례 {i} 쉬운 요약]\n(비전문가가 이해하기 쉽게 3줄 요약)\n\n[핵심 시사점]\n(고객 상황에 맞는 절세 시사점 1~2줄)\n===SPLIT===\n"
+        split_format += f"[판례 {i} 간단 요약]\n(비전문가가 이해하기 쉽게 3줄 요약)\n\n[핵심 시사점]\n(고객 상황에 맞는 절세 시사점 1~2줄)\n===SPLIT===\n"
     
     return f"""
     당신은 '라온헤리티지연구소'의 AI 세무 컨설턴트입니다.
