@@ -44,48 +44,113 @@ def load_pre_embedded_data():
 
 
 # ==========================================
-# 사이드바 (고객 사전 문진표)
+# 사이드바 (단계별 고객 사전 문진표 - 심층 컨설팅용)
 # ==========================================
-with st.sidebar:
-    st.markdown("## 📋 상세 상담 문진표")
-    
-    # 1. 가족 상황 (상속인 관계 및 공제 여부)
-    st.subheader("👨‍👩‍👧‍👦 가족 관계")
-    family_spouse = st.radio("배우자 생존 여부", ["생존", "사망"], index=0)
-    family_kids = st.number_input("자녀 수 (명)", min_value=0, max_value=10, value=2)
-    has_heir_issues = st.checkbox("가족 간 재산 분배 관련 갈등 소지 있음")
-    
-    # 2. 자산 현황 (상속세 과세 표준 산출 기초)
-    st.subheader("💰 자산 현황")
-    asset_size = st.select_slider("예상 총 자산 규모", options=["10억 미만", "10억~30억", "30억~50억", "50억~100억", "100억 이상"])
-    asset_types = st.multiselect("보유 자산 유형", ["거주용 부동산", "수익형 부동산(상가/빌딩)", "예적금/금융자산", "비상장 주식(법인)", "보험/연금"])
-    debt_exists = st.checkbox("최근 10년 내 발생한 대규모 채무(부채) 있음")
-    
-    # 3. 사전 전략 및 리스크 (절세 핵심)
-    st.subheader("🛡️ 절세 전략 및 리스크")
-    has_pre_gift = st.checkbox("최근 10년 내 자녀/배우자에게 증여한 적 있음")
-    business_succession = st.checkbox("가업 승계(법인 경영권 이전)가 포함됨")
-    
-    # 4. 상담 목적 (답변의 방향성)
-    st.subheader("🎯 상담 목적")
-    primary_goal = st.selectbox("컨설팅 핵심 목표", 
-                                ["상속세 세무조사 대비(리스크 사전진단)", 
-                                 "합법적인 사전증여 플랜 수립", 
-                                 "가업상속공제 등 특례 적용 가능성 검토", 
-                                 "상속 재원 마련(종신보험/신탁) 전략"])
 
-# AI가 답변을 생성할 때 참조할 프로필 문자열을 정교화합니다.
+# 1. 화면이동 및 데이터 저장을 위한 초기화
+if 'step' not in st.session_state:
+    st.session_state.step = 1
+
+# 사용자가 입력한 값을 단계가 넘어가도 기억하도록 기본값 세팅 (양도/취득세/메모 항목 추가)
+default_states = {
+    "family_spouse": "예 (생존)", "family_kids": 2, "has_heir_issues": False,
+    "asset_size": "10억~30억", "asset_types": [], 
+    "is_multi_home": "해당 없음 (무주택/상가만 보유)", "sell_plan": False,
+    "has_pre_gift": False, "transfer_timing": "아직 구체적 계획 없음", 
+    "acq_tax_issue": False, "business_succession": False, 
+    "primary_goal": "상속/증여 종합 절세 플랜 수립", "special_memo": ""
+}
+
+for key, val in default_states.items():
+    if key not in st.session_state:
+        st.session_state[key] = val
+
+# 단계 이동 함수 (4단계로 확장)
+def next_step(): 
+    if st.session_state.step < 4: st.session_state.step += 1
+def prev_step(): 
+    if st.session_state.step > 1: st.session_state.step -= 1
+
+with st.sidebar:
+    st.markdown("## 📋 맞춤형 절세 플래너")
+    st.markdown("<p style='font-size: 13px; color: #64748b;'>양도/취득세까지 고려한 완벽한 플랜을 위해 4단계 문진을 진행합니다.</p>", unsafe_allow_html=True)
+    
+    # 상단 진행률 표시 (4단계 기준)
+    progress_val = int((st.session_state.step / 4) * 100)
+    st.progress(st.session_state.step / 4, text=f"진행률 {progress_val}%")
+    st.markdown("---")
+
+    # [1단계] 가족 관계
+    if st.session_state.step == 1:
+        st.subheader("1단계: 가족 관계 👨‍👩‍👧‍👦")
+        st.radio("배우자님이 계신가요?", ["예 (생존)", "아니오 (사망/미혼)"], key="family_spouse", help="배우자 상속공제(최소 5억~최대 30억) 적용 여부를 판단합니다.")
+        st.number_input("슬하의 자녀분은 몇 분이신가요?", min_value=0, max_value=10, key="family_kids")
+        st.checkbox("가족 간 재산 분배 관련 갈등 소지가 있나요?", key="has_heir_issues")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.button("다음 단계로 ➡️", use_container_width=True, on_click=next_step)
+
+    # [2단계] 자산 및 양도세 이슈
+    elif st.session_state.step == 2:
+        st.subheader("2단계: 보유 자산 및 양도 계획 💰")
+        st.select_slider("예상 총 자산 규모", options=["10억 미만", "10억~30억", "30억~50억", "50억~100억", "100억 이상"], key="asset_size")
+        st.multiselect("보유 중인 자산 유형을 모두 골라주세요", ["거주용 아파트/주택", "수익형 부동산(상가/빌딩)", "토지/임야", "예적금/금융자산", "비상장 주식(법인)"], key="asset_types")
+        
+        st.markdown("**주택 보유 현황 (양도세 중과 판별)**")
+        st.radio("현재 세대 기준 주택 보유 수는 어떻게 되시나요?", ["1주택자", "2주택자", "3주택 이상 다주택자", "해당 없음 (무주택/상가만 보유)"], key="is_multi_home")
+        st.checkbox("가까운 시일 내에 부동산을 매각(양도)할 계획이 있으신가요?", key="sell_plan", help="양도소득세와 증여세 중 어떤 것이 유리할지 비교하기 위해 필요합니다.")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
+        with col2: st.button("다음 ➡️", use_container_width=True, on_click=next_step)
+
+    # [3단계] 상속/증여 및 취득세 이슈
+    elif st.session_state.step == 3:
+        st.subheader("3단계: 재산 이전 및 취득 계획 🎁")
+        st.checkbox("최근 10년 내 가족에게 증여하신 적이 있나요?", key="has_pre_gift", help="10년 이내 증여재산은 상속세 과세가액에 합산됩니다.")
+        st.radio("재산 이전(증여 등) 예상 시기는 언제인가요?", ["당장 진행을 고려 중 (1년 이내)", "단기 계획 (1년~3년)", "장기 계획 (3년 이후)", "아직 구체적 계획 없음"], key="transfer_timing")
+        st.checkbox("부동산을 상속/증여받을 때 발생하는 **취득세** 부담이 걱정되시나요?", key="acq_tax_issue", help="상속/증여 시 무상취득에 따른 취득세(최대 12%) 재원 마련 전략이 필요합니다.")
+        st.checkbox("가업 승계(법인 지분/경영권 이전)가 포함되나요?", key="business_succession")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
+        with col2: st.button("다음 ➡️", use_container_width=True, on_click=next_step)
+
+    # [4단계] 절세 목표 및 자유 메모
+    elif st.session_state.step == 4:
+        st.subheader("4단계: 목표 및 특이사항 🎯")
+        st.selectbox("이번 컨설팅의 가장 핵심 목표는 무엇인가요?", 
+                    ["상속/증여 종합 절세 플랜 수립", "다주택자 양도 vs 증여 유불리 비교", "취득세 등 세금 납부 재원 마련 전략", "가업상속공제 특례 적용 검토", "세무조사 리스크 사전 진단"], key="primary_goal")
+        
+        st.markdown("**기타 메모 및 특이사항**")
+        st.text_area("AI에게 미리 알리고 싶은 특수한 상황이나 질문을 자유롭게 적어주세요.", 
+                     placeholder="예: 5년 전에 장남에게 아파트를 하나 증여한 적이 있습니다. / 비상장 법인에 가수금이 많습니다.", 
+                     height=100, key="special_memo")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2 = st.columns(2)
+        with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
+        with col2: 
+            if st.button("✅ 입력 완료", use_container_width=True):
+                st.success("준비가 완료되었습니다! 우측 하단 채팅창에 질문을 남겨주세요.")
+
+# AI가 참조할 프로필 문자열 (양도/취득세/메모 내용 포함)
 user_profile = f"""
 [고객 프로필]
-- 배우자: {family_spouse}
-- 자녀: {family_kids}명
-- 갈등 소지: {'있음' if has_heir_issues else '없음'}
-- 자산규모: {asset_size}
-- 자산유형: {', '.join(asset_types)}
-- 대규모 부채: {'있음' if debt_exists else '없음'}
-- 사전증여 이력: {'있음' if has_pre_gift else '없음'}
-- 가업승계 포함: {'예' if business_succession else '아니오'}
-- 목표: {primary_goal}
+- 가족관계: 배우자 {st.session_state.family_spouse}, 자녀 {st.session_state.family_kids}명
+- 가족갈등 소지: {'있음' if st.session_state.has_heir_issues else '없음'}
+- 자산규모: {st.session_state.asset_size}
+- 자산유형: {', '.join(st.session_state.asset_types) if st.session_state.asset_types else '미입력'}
+- 주택보유수: {st.session_state.is_multi_home} (양도세 중과 검토용)
+- 부동산 매각계획: {'있음' if st.session_state.sell_plan else '없음'}
+- 10년내 사전증여: {'있음' if st.session_state.has_pre_gift else '없음'}
+- 증여/상속 예상시기: {st.session_state.transfer_timing}
+- 취득세 이슈 고려: {'예 (재원 마련 방안 필요)' if st.session_state.acq_tax_issue else '아니오'}
+- 가업승계 포함: {'예' if st.session_state.business_succession else '아니오'}
+- 핵심목표: {st.session_state.primary_goal}
+- 기타 특이사항(메모): {st.session_state.special_memo if st.session_state.special_memo else '없음'}
 """
 # ==========================================
 # 메인 화면
