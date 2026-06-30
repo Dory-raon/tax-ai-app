@@ -107,7 +107,7 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
         
     else:
         # [새로운 기능 2] 답변 생성 중 로딩 문구 표시
-        with st.spinner("AI가 쾌속으로 판례를 요약하고 맞춤형 절세 플랜을 작성 중입니다..."):
+        with st.spinner("AI가 관련 판례와 라온헤리티지 데이터베이스를 검색하고 맞춤형 절세 플랜을 작성 중입니다..."):
             
             # 검색 (임베딩)
             query_result = client.models.embed_content(model=EMBEDDING_MODEL, contents=prompt)
