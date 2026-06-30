@@ -60,8 +60,12 @@ col_icon, col_title = st.columns([1, 10])
 with col_icon:
     st.image("favicon.jpg", width=50) # 로고 파일명
 with col_title:
-    st.title("라온헤리티지연구소 상속/증여 컨설팅 AI")
-st.markdown("사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례를 바탕으로 최적의 솔루션을 제공합니다.")
+ st.markdown("""
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="https://raonheritage.com/logo.jpg" width="45" style="margin-right: 12px; border-radius: 8px;">
+        <h1 style="margin: 0; color: #1e3a8a; font-size: 32px;">라온헤리티지연구소 상속/증여 컨설팅 AI</h1>
+    </div>
+""", unsafe_allow_html=True)
 
 with st.spinner('지식 데이터베이스를 불러오는 중입니다...'):
     db = load_pre_embedded_data()
