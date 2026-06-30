@@ -6,22 +6,28 @@ import os
 from google import genai
 import design 
 
+# 페이지 설정은 import 이후 가장 먼저 나옵니다.
 st.set_page_config(
     page_title="라온헤리티지연구소 세무 AI", 
     page_icon="🏛️", 
     layout="wide",
-    initial_sidebar_state="expanded" # 사이드바가 항상 보이도록 강제 고정
+    initial_sidebar_state="expanded"
 )
 
+# 디자인 적용
 design.apply_premium_css()
 
-# 사이드바 강제 고정 CSS 추가 (혹시 모를 숨김 방지)
+# 사이드바 강제 고정 CSS
 st.markdown("""
     <style>
-        [data-testid="stSidebar"] { min-width: 300px !important; }
+        [data-testid="stSidebar"] {
+            display: flex !important;
+            min-width: 300px !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
+# API 및 클라이언트 설정
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 GENERATION_MODEL = 'gemini-2.5-flash'
