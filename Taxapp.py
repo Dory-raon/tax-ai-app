@@ -118,7 +118,7 @@ with st.sidebar:
         with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
         with col2: st.button("다음 ➡️", use_container_width=True, on_click=next_step)
 
-    # [4단계] 절세 목표 및 자유 메모
+   # [4단계] 절세 목표 및 자유 메모
     elif st.session_state.step == 4:
         st.subheader("4단계: 목표 및 특이사항 🎯")
         st.selectbox("이번 컨설팅의 가장 핵심 목표는 무엇인가요?", 
@@ -130,14 +130,23 @@ with st.sidebar:
                      height=100, key="special_memo")
         
         st.markdown("<br>", unsafe_allow_html=True)
+        
+        # 버튼을 2개로 나누어 배치
         col1, col2 = st.columns(2)
-        with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
+        with col1: 
+            st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
         with col2: 
-            if st.button("✅ 입력 완료", use_container_width=True):
-                # 좁은 success 대신 우측 하단에 세련된 팝업 띄우기
-                st.toast("준비가 완료되었습니다! 우측 하단 채팅창에 질문을 남겨주세요.", icon="🎉")
-                # (선택) 시각적인 재미를 위해 풍선 이펙트를 넣고 싶다면 아래 주석을 푸세요
-                # st.balloons() 
+            # 클릭 여부를 submit_btn 변수에 저장
+            submit_btn = st.button("✅ 입력 완료", use_container_width=True)
+            
+        # 버튼들(col1, col2) 아래로 빠져나와서, 클릭 시 전체 너비로 예쁜 알림창 띄우기
+        if submit_btn:
+            st.markdown("""
+                <div style="margin-top: 15px; padding: 15px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center; color: #166534; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <span style="font-size: 16px; font-weight: bold;">🎉 준비가 완료되었습니다!</span><br>
+                    <span style="font-size: 14px; margin-top: 5px; display: inline-block;">우측 하단 채팅창에 질문을 남겨주세요.</span>
+                </div>
+            """, unsafe_allow_html=True)
 
 # AI가 참조할 프로필 문자열 (양도/취득세/메모 내용 포함)
 user_profile = f"""
