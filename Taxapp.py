@@ -35,23 +35,46 @@ def load_pre_embedded_data():
 # 사이드바 (고객 사전 문진표)
 # ==========================================
 with st.sidebar:
-    if os.path.exists("logo.png"):
-        st.image("logo.png", use_container_width=True)
-    else:
-        st.markdown("<h2 style='text-align: center; color: #1e3a8a;'>라온헤리티지연구소</h2>", unsafe_allow_html=True)
+    st.markdown("## 📋 상세 상담 문진표")
     
-    st.markdown("---")
-    st.subheader("📋 고객 상황 체크리스트")
-    st.caption("배경지식을 입력하시면 맞춤형 절세 플랜이 제공됩니다.")
-    
-    family_spouse = st.radio("배우자 생존 여부", ["있음 (배우자공제 가능)", "없음 (일괄공제 5억 적용)"], index=0)
+    # 1. 가족 상황 (상속인 관계 및 공제 여부)
+    st.subheader("👨‍👩‍👧‍👦 가족 관계")
+    family_spouse = st.radio("배우자 생존 여부", ["생존", "사망"], index=0)
     family_kids = st.number_input("자녀 수 (명)", min_value=0, max_value=10, value=2)
-    asset_size = st.selectbox("예상 총 자산 규모", ["10억 미만 (상속세 면제 가능성 높음)", "10억 ~ 30억 (전략적 분배 필요)", "30억 ~ 50억 (사전증여 필수)", "50억 이상 (가업승계/신탁 고려)"])
-    asset_types = st.multiselect("주요 보유 자산 (다중 선택)", ["거주용 주택/아파트", "상가/빌딩 (수익형 부동산)", "현금 및 예적금", "비상장 주식 (가업/법인)"])
-    primary_goal = st.selectbox("컨설팅 주요 목적", ["상속세/증여세 최소화", "상속세 납부 재원 마련", "자녀 간 분쟁 없는 원활한 분배", "가업 승계 및 경영권 방어"])
+    has_heir_issues = st.checkbox("가족 간 재산 분배 관련 갈등 소지 있음")
+    
+    # 2. 자산 현황 (상속세 과세 표준 산출 기초)
+    st.subheader("💰 자산 현황")
+    asset_size = st.select_slider("예상 총 자산 규모", options=["10억 미만", "10억~30억", "30억~50억", "50억~100억", "100억 이상"])
+    asset_types = st.multiselect("보유 자산 유형", ["거주용 부동산", "수익형 부동산(상가/빌딩)", "예적금/금융자산", "비상장 주식(법인)", "보험/연금"])
+    debt_exists = st.checkbox("최근 10년 내 발생한 대규모 채무(부채) 있음")
+    
+    # 3. 사전 전략 및 리스크 (절세 핵심)
+    st.subheader("🛡️ 절세 전략 및 리스크")
+    has_pre_gift = st.checkbox("최근 10년 내 자녀/배우자에게 증여한 적 있음")
+    business_succession = st.checkbox("가업 승계(법인 경영권 이전)가 포함됨")
+    
+    # 4. 상담 목적 (답변의 방향성)
+    st.subheader("🎯 상담 목적")
+    primary_goal = st.selectbox("컨설팅 핵심 목표", 
+                                ["상속세 세무조사 대비(리스크 사전진단)", 
+                                 "합법적인 사전증여 플랜 수립", 
+                                 "가업상속공제 등 특례 적용 가능성 검토", 
+                                 "상속 재원 마련(종신보험/신탁) 전략"])
 
-user_profile = f"배우자: {family_spouse}, 자녀 수: {family_kids}명, 자산규모: {asset_size}, 주요자산: {', '.join(asset_types)}, 주요목적: {primary_goal}"
-
+# AI가 답변을 생성할 때 참조할 프로필 문자열을 정교화합니다.
+user_profile = f"""
+[고객 프로필]
+- 배우자: {family_spouse}
+- 자녀: {family_kids}명
+- 갈등 소지: {'있음' if has_heir_issues else '없음'}
+- 자산규모: {asset_size}
+- 자산유형: {', '.join(asset_types)}
+- 대규모 부채: {'있음' if debt_exists else '없음'}
+- 사전증여 이력: {'있음' if has_pre_gift else '없음'}
+- 가업승계 포함: {'예' if business_succession else '아니오'}
+- 목표: {primary_goal}
+"""
 # ==========================================
 # 메인 화면
 # ==========================================
