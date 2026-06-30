@@ -16,10 +16,35 @@ st.set_page_config(
 design.apply_premium_css()
 
 st.markdown("""
-    <div style="text-align: center; margin-top: 10px; margin-bottom: 50px;">
-        <!-- 로고만 엄청 크게, 가운데 정렬, 살짝 반투명하게 스며들도록 설정 -->
-        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo_horizontal.png" 
-             style="max-width: 800px; width: 85%; height: auto; opacity: 0.9;">
+    <style>
+    /* 1. 스트림릿 화면 상단의 쓸데없는 빈 공간(여백)을 위로 바싹 끌어올리기 */
+    .block-container {
+        padding-top: 1rem !important;
+    }
+    
+    /* 2. 엑셀 틀고정(Sticky) 기능 및 헤더 디자인 */
+    .fixed-header {
+        position: sticky;
+        top: 0px; /* 화면 맨 위에 닿으면 찰싹 달라붙도록 설정 */
+        background: rgba(255, 255, 255, 0.95); /* 스크롤 시 밑의 글자들을 가리기 위해 95% 불투명한 하얀색 배경 적용 */
+        backdrop-filter: blur(8px); /* 배경을 살짝 블러 처리하여 고급스러운 유리 질감 효과 */
+        z-index: 9999; /* 채팅창 등 다른 모든 요소보다 무조건 맨 위에 오도록 설정 */
+        display: flex;
+        align-items: center;
+        padding: 15px 0px 15px 10px; /* 위아래 여백을 좁혀서 슬림하게 만듦 */
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    </style>
+
+    <div class="fixed-header">
+        <!-- 가로형 로고 (높이 45px로 조절하여 답답하지 않게 공간 차지 최소화) -->
+        <img src="https://raw.githubusercontent.com/Dory-raon/tax-ai-app/main/logo_horizontal.png" style="height: 45px; margin-right: 20px;">
+        
+        <!-- 로고와 제목 사이 세로선 및 AI 타이틀 가로 배치 -->
+        <div style="border-left: 2px solid #e2e8f0; padding-left: 20px;">
+            <h1 style="margin: 0; color: #1e3a8a; font-size: 24px; letter-spacing: -0.5px;">라온헤리티지연구소 상속/증여 컨설팅 AI</h1>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
