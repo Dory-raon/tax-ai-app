@@ -15,6 +15,8 @@ st.set_page_config(
 
 design.apply_premium_css()
 
+# [버그의 원인이던 사이드바 강제 고정 CSS를 완벽히 제거했습니다]
+
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 GENERATION_MODEL = 'gemini-2.5-flash'
@@ -43,7 +45,7 @@ def load_pre_embedded_data():
 if 'step' not in st.session_state:
     st.session_state.step = 1
 
-# 사용자가 입력한 값을 단계가 넘어가도 기억하도록 기본값 세팅 (양도/취득세/메모 항목 추가)
+# 사용자가 입력한 값을 단계가 넘어가도 기억하도록 기본값 세팅
 default_states = {
     "family_spouse": "예 (생존)", "family_kids": 2, "has_heir_issues": False,
     "asset_size": "10억~30억", "asset_types": [], 
@@ -67,7 +69,7 @@ with st.sidebar:
     st.markdown("## 📋 맞춤형 세무전략 플래너")
     st.markdown("<p style='font-size: 13px; color: #64748b;'>고객님의 상황을 고려한 완벽한 플랜을 위해 4단계 문진을 진행합니다.</p>", unsafe_allow_html=True)
     
-    # 상단 진행률 표시 (4단계 기준)
+    # 상단 진행률 표시
     progress_val = int((st.session_state.step / 4) * 100)
     st.progress(st.session_state.step / 4, text=f"진행률 {progress_val}%")
     st.markdown("---")
@@ -110,7 +112,7 @@ with st.sidebar:
         with col1: st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
         with col2: st.button("다음 ➡️", use_container_width=True, on_click=next_step)
 
-   # [4단계] 절세 목표 및 자유 메모
+    # [4단계] 절세 목표 및 자유 메모
     elif st.session_state.step == 4:
         st.subheader("4단계: 목표 및 특이사항 🎯")
         st.selectbox("이번 컨설팅의 가장 핵심 목표는 무엇인가요?", 
@@ -128,10 +130,9 @@ with st.sidebar:
         with col1: 
             st.button("⬅️ 이전", use_container_width=True, on_click=prev_step)
         with col2: 
-            # 클릭 여부를 submit_btn 변수에 저장
             submit_btn = st.button("✅ 입력 완료", use_container_width=True)
             
-        # 버튼들(col1, col2) 아래로 빠져나와서, 클릭 시 전체 너비로 예쁜 알림창 띄우기
+        # 버튼들 아래로 빠져나와서, 클릭 시 전체 너비로 예쁜 알림창 띄우기
         if submit_btn:
             st.markdown("""
                 <div style="margin-top: 15px; padding: 15px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; text-align: center; color: #166534; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
@@ -147,7 +148,7 @@ user_profile = f"""
 - 가족갈등 소지: {'있음' if st.session_state.has_heir_issues else '없음'}
 - 자산규모: {st.session_state.asset_size}
 - 자산유형: {', '.join(st.session_state.asset_types) if st.session_state.asset_types else '미입력'}
-- 주택보유수: {st.session_state.is_multi_home} (양도세 중과 검토용)
+- 주택보유수: {st.session_state.is_multi_home}
 - 부동산 매각계획: {'있음' if st.session_state.sell_plan else '없음'}
 - 10년내 사전증여: {'있음' if st.session_state.has_pre_gift else '없음'}
 - 증여/상속 예상시기: {st.session_state.transfer_timing}
@@ -156,8 +157,9 @@ user_profile = f"""
 - 핵심목표: {st.session_state.primary_goal}
 - 기타 특이사항(메모): {st.session_state.special_memo if st.session_state.special_memo else '없음'}
 """
+
 # ==========================================
-# 메인 화면
+# 메인 화면 (오류 완벽 해결 및 최적화)
 # ==========================================
 github_user = "Dory-raon"
 repo_name = "tax-ai-app"
@@ -168,16 +170,31 @@ html_code = f"""<style>
 .block-container {{ padding-top: 2rem !important; }}
 .stMainBlockContainer {{ padding-top: 2rem !important; }}
 
+/* 💡 핵심 수정: 사이드바 펼치기 버튼과 사이드바를 무조건 화면 맨 위로 끌어올림 */
+[data-testid="collapsedControl"] {{
+    z-index: 100000 !important;
+}}
+[data-testid="stSidebar"] {{
+    z-index: 100000 !important;
+}}
+header[data-testid="stHeader"] {{
+    background: transparent !important;
+    z-index: 99998 !important; 
+}}
+[data-testid="stToolbar"] {{
+    display: none !important;
+}}
+
 .fixed-header {{
 position: sticky;
 top: 0px; 
 background: rgba(255, 255, 255, 0.95); 
 backdrop-filter: blur(8px); 
-z-index: 9999; 
+z-index: 99990; /* 헤더는 사이드바보다 밑에 깔리도록 설정 */
 display: flex;
 justify-content: space-between; 
 align-items: center;
-/* 💡 좌측 여백을 60px로 늘려 사이드바 펼치기 버튼과 아이콘이 안 겹치게 방어했습니다 */
+/* 💡 펼치기 버튼이 눌릴 수 있도록 왼쪽 여백을 충분히 확보 */
 padding: 15px 30px 15px 60px; 
 margin-top: -2rem; 
 margin-bottom: 30px;
@@ -198,18 +215,8 @@ display: flex;
 align-items: center;
 flex-shrink: 0;
 }}
-
-/* 💡 헤더 전체를 숨기지 않고 투명하게 만들어 사이드바 버튼은 살려둠 */
-header[data-testid="stHeader"] {{
-background: transparent !important;
-z-index: 10000 !important; /* 커스텀 헤더보다 위로 올려서 클릭 가능하게 함 */
-}}
-
-/* 💡 우측 상단의 거슬리는 메뉴(햄버거, Deploy)만 핀포인트로 삭제 */
-[data-testid="stToolbar"] {{
-display: none !important;
-}}
 </style>
+
 <div class="fixed-header">
 <div class="header-left">
 <img src="{icon_url}" style="width: 100px; height: 100px; border-radius: 15px; margin-right: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0;">
@@ -223,6 +230,7 @@ display: none !important;
 st.markdown(html_code, unsafe_allow_html=True)
 
 st.markdown("<p style='color: #475569; font-size: 20px; margin-bottom: 40px;'>사이드바에 고객님의 상황을 입력한 뒤 질문하시면, 라온헤리티지연구소의 축적된 판례와 노하우를 바탕으로 최적의 솔루션을 제공합니다.</p>", unsafe_allow_html=True)
+
 with st.spinner('지식 데이터베이스를 불러오는 중입니다...'):
     db = load_pre_embedded_data()
 
@@ -241,12 +249,11 @@ for turn in st.session_state.chat_history:
 
 if prompt := st.chat_input("상담 내용을 입력하세요"):
     
-    # [새로운 기능 1] AI 문지기를 통한 토큰 낭비 방지 (비용 방어)
+    # [AI 문지기를 통한 토큰 낭비 방지]
     gate_prompt = f"다음 질문이 세무, 회계, 상속, 증여, 절세 플랜, 재무 컨설팅과 관련된 질문인지 판별하세요. 맞으면 'O', 전혀 엉뚱한 질문이면 'X'만 출력하세요.\n질문: {prompt}"
     gate_res = client.models.generate_content(model=GENERATION_MODEL, contents=gate_prompt)
     
     if "X" in gate_res.text.upper():
-        # 엉뚱한 질문일 경우 정중하게 거절하고 아래의 복잡한 로직을 전부 패스합니다.
         reject_msg = "안녕하세요, 라온헤리티지연구소입니다. 죄송하지만 저는 상속, 증여, 양도 등 세무 및 절세 플랜 컨설팅에 특화된 AI입니다. 세무와 관련된 질문을 남겨주시면 전문적인 판례와 함께 최선을 다해 답변해 드리겠습니다."
         cases_html = "<div style='padding:20px; color:#64748b; font-size:14px; background-color:#f8fafc; border-radius:8px;'>해당 질문은 세무 컨설팅과 관련이 없어 판례 검색이 생략되었습니다.</div>"
         
@@ -266,7 +273,6 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
         })
         
     else:
-        # [새로운 기능 2] 답변 생성 중 로딩 문구 표시
         with st.spinner("AI가 관련 판례와 라온헤리티지 데이터베이스를 검색하고 맞춤형 절세 플랜을 작성 중입니다..."):
             
             # 검색 (임베딩)
@@ -275,25 +281,22 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
             db['유사도'] = db['Embedding'].apply(lambda x: cosine_similarity(query_emb, x))
             retrieved = db.sort_values(by='유사도', ascending=False).head(2)
             
-            # 원문 취합 (AI한테 넘겨줄 용도)
+            # 원문 취합 
             context = ""
             for i, (_, row) in enumerate(retrieved.iterrows()):
                 context += f"[판례 {i+1}]\n- 사건명: {row['사건명']}\n- 판결요지: {row['판결요지']}\n\n"
             
-            # 🚀 AI에게는 쓸데없는 거 빼고 '요약'과 '답변' 글자만 짧게 뽑으라고 시킵니다!
+            # 프롬프트 조립 및 생성
             fast_prompt = design.get_fast_prompt(context, prompt, user_profile, len(retrieved))
             response = client.models.generate_content(model=GENERATION_MODEL, contents=fast_prompt)
             
-            # AI가 빠르게 내뱉은 답변 자르기
+            # 결과 처리
             parts = response.text.split("===SPLIT===")
             cases_html = ""
             
-            # AI가 준 요약문 + 파이썬이 들고 있던 원문 + HTML 껍데기를 0.001초만에 순식간에 조립!
             if len(parts) >= len(retrieved) + 1:
                 for i, (_, row) in enumerate(retrieved.iterrows()):
-                    # AI가 짧게 만들어준 요약문
                     summary_text = parts[i].strip().replace('\n', '<br>')
-                    # 파이썬이 갖고 있던 진짜 원문
                     original_text = row['판결요지'].replace('\n', '<br>')
                     
                     cases_html += f"""
@@ -310,7 +313,6 @@ if prompt := st.chat_input("상담 내용을 입력하세요"):
                         </details>
                     </div>
                     """
-                # 마지막 파트는 메인 답변
                 assistant_reply = parts[-1].strip()
             else:
                 cases_html = "<div style='padding:20px; color:#991b1b;'>결과를 처리하는 중 오류가 발생했습니다.</div>"
