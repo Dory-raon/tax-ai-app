@@ -15,15 +15,6 @@ st.set_page_config(
 
 design.apply_premium_css()
 
-st.markdown("""
-    <style>
-        [data-testid="stSidebar"] {
-            display: flex !important;
-            min-width: 300px !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 API_KEY = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=API_KEY)
 GENERATION_MODEL = 'gemini-2.5-flash'
@@ -186,7 +177,8 @@ z-index: 9999;
 display: flex;
 justify-content: space-between; 
 align-items: center;
-padding: 15px 30px;
+/* 💡 좌측 여백을 60px로 늘려 사이드바 펼치기 버튼과 아이콘이 안 겹치게 방어했습니다 */
+padding: 15px 30px 15px 60px; 
 margin-top: -2rem; 
 margin-bottom: 30px;
 border-bottom: 1px solid #e2e8f0;
@@ -207,8 +199,15 @@ align-items: center;
 flex-shrink: 0;
 }}
 
+/* 💡 헤더 전체를 숨기지 않고 투명하게 만들어 사이드바 버튼은 살려둠 */
 header[data-testid="stHeader"] {{
-display: none;
+background: transparent !important;
+z-index: 10000 !important; /* 커스텀 헤더보다 위로 올려서 클릭 가능하게 함 */
+}}
+
+/* 💡 우측 상단의 거슬리는 메뉴(햄버거, Deploy)만 핀포인트로 삭제 */
+[data-testid="stToolbar"] {{
+display: none !important;
 }}
 </style>
 <div class="fixed-header">
